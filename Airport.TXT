@@ -1,0 +1,393 @@
+import java.util.*;
+
+import static java.lang.Character.isDigit;
+
+public class Airport {
+    public static final int MAX_NUMBER_OF_EMPLOYEES = 10;
+
+    private static Employee[] employeesList = new Employee[MAX_NUMBER_OF_EMPLOYEES];
+    private static HashMap<Integer, Plane> planesList = new HashMap<>();
+    private static ArrayList<Flight> flightsList = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+
+        short ans;
+        boolean start = false;
+
+        System.out.println("Vas privetstvuet airport named after Vladosss. Choose what do u want to do:\n1. Dobavit' plane\n2. Dobavit' employee\n3. Dobavit' flight\n4. Show flights\nFor exit vvedite 0\nVvedite chislo: ");
+        while (true) {
+            if (start)
+                System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nChoose what do u want to do:\n1. Dobavit' plane\n2. Dobavit' employee\n3. Dobavit' flight\n4. Show flights\nFor exit vvedite 0\nVvedite chislo: ");
+            start = true;
+            ans = scanner.nextShort();
+            while (ans > 4 || ans < 0) {
+                System.out.println("Vvedite correct number (0-4): ");
+                ans = scanner.nextShort();
+            }
+            switch (ans) {
+                case (1): {
+                    addPlane();
+                    break;
+                }
+                case (2): {
+                    addEmployee();
+                    break;
+                }
+                case (3): {
+                    addFlight();
+                    break;
+                }
+                case (4): {
+                    showFlights();
+                    break;
+                }
+                case (0): {
+                    scanner.close();
+                    System.exit(0);
+                    break;
+                }
+                default: {
+                    System.out.println("Smth wrong, closing program");
+                    scanner.close();
+                    System.exit(1);
+                }
+            }
+
+        }
+
+    }
+    public static void addEmployee() {
+        int i = 0;
+        int age;
+
+        while (i < employeesList.length && employeesList[i] != null)
+            i++;
+        if (i == employeesList.length)
+            System.out.println("Sorry, but there is no vacant places =(");
+
+        System.out.println("Vvedite name of the employee (0 for exit): ");
+        String name = scanner.next();
+        if (exitCheck(name)) return;
+
+        System.out.println("Vvedite surname of the employee (0 for exit): ");
+        String surname = scanner.next();
+        if (exitCheck(surname)) return;
+
+        System.out.println("Vvedite dolzhnost' of the employee (0 for exit): ");
+        String position = scanner.next();
+        if (exitCheck(position)) return;
+
+        System.out.println("Vvedite age of the employee (0 for exit): ");
+        while (true) {
+           age = scanner.nextInt();
+            if (exitCheck(age)) return;
+            if (age < 18) {
+                System.out.println("Incorrect value, employee should be 18+, retry (0 for exit): ");
+            } else break;
+        }
+
+        Employee employee = new Employee(name, surname, position, age);
+        employeesList[i] = employee;
+
+        System.out.println("The employee is successfully dobavlen.");
+    }
+
+    public static void addPlane() {
+        Integer key;
+        double weight;
+        int capacity;
+
+        System.out.println("Vvedite mark of the samolet, w/t spaces (0 for exit): ");
+        String mark = scanner.next();
+        if (exitCheck(mark)) return;
+
+        System.out.println("Vvedite number of the samolet (0 for exit): ");
+        while (true) {
+            key = scanner.nextInt();
+            if (exitCheck(key)) return;
+            if (key < 0) {
+                System.out.println("Wrong value, should be positive, retry (0 for exit): ");
+            } else if (planesList.containsKey(key)) {
+                System.out.println("This plane is already exists, retry (0 for exit): ");
+            } else break;
+        }
+
+        System.out.println("Vvedite weight of the samolet (0 for exit): ");
+        while (true) {
+            weight = scanner.nextDouble();
+            if (exitCheck(weight)) return;
+            if (weight < 0) {
+                System.out.println("Wrong value, should be positive, retry (0 for exit): ");
+            } else break;
+        }
+
+        System.out.println("Vvedite capacity of the samolet (0 for exit): ");
+        while (true) {
+            capacity = scanner.nextInt();
+            if (exitCheck(capacity)) return;
+            if (capacity < 0) {
+                System.out.println("Wrong value, should be positive, retry (0 for exit): ");
+            } else break;
+        }
+
+        Plane plane = new Plane(mark, weight, capacity, key, true);
+        planesList.put(key, plane);
+
+        System.out.println("The samolet is successfully dobavlen.");
+    }
+
+    public static void addFlight() {
+        GregorianCalendar date = new GregorianCalendar();
+        int dd, mm, yyyy;
+        String stringDate;
+        boolean start = false;
+        int takenSeats;
+
+        System.out.println("Vvedite number of the samoleta which will fly (0 for exit): ");
+        int key = scanner.nextInt();
+        if (exitCheck(key)) return;
+        while (true) {
+            if (!planesList.containsKey(key)) {
+                System.out.println("There is no plane like this, retry (0 for exit): ");
+                key = scanner.nextInt();
+                if (exitCheck(key)) return;
+            } else if (planesList.get(key).getVacant()) {
+                planesList.get(key).setVacant(false);
+                break;
+            } else {
+                System.out.println("Chosen plane isnt vacant, retry (0 for exit): ");
+                key = scanner.nextInt();
+                if (exitCheck(key)) return;
+            }
+        }
+
+        System.out.println("Vvedite number of zabronirovannyh mest (-1 for exit): ");
+        while (true) {
+            takenSeats = scanner.nextInt();
+            if (takenSeats < -1) {
+                System.out.println("Wrong value, shouldnt be negative (or -1), retry (-1 for exit): ");
+            } else if (takenSeats == -1) {
+                System.out.println("Vvod is canceled, back to the main menu.");
+                return;
+            } else if (planesList.get(key).getCapacity() < takenSeats) {
+                System.out.println("Error, the capacity of the plane is less than the number of taken seats. Retry (-1 for exit): ");
+            } else break;
+        }
+
+        System.out.println("Vvedite datu of the flight in format dd/mm/yyyy (0 for exit): ");
+        stringDate = scanner.next();
+        if (exitCheck(stringDate)) return;
+
+        while (true) {
+            if (start) {
+                System.out.println("Wrong format, retry (dd/mm/yyyy) (0 for exit): ");
+                stringDate = scanner.next();
+                if (exitCheck(stringDate)) return;
+            }
+            start = true;
+            while (true) {
+                if (stringDate.length() == 10)
+                    if (stringDate.charAt(2) == '/' && stringDate.charAt(5) == '/')
+                        if (isDigit(stringDate.charAt(0)) && isDigit(stringDate.charAt(1)) && isDigit(stringDate.charAt(3)) && isDigit(stringDate.charAt(4)) && isDigit(stringDate.charAt(6)) && isDigit(stringDate.charAt(7)) && isDigit(stringDate.charAt(8)) && isDigit(stringDate.charAt(9)))
+                            break;
+                    System.out.println("Wrong format, retry (dd/mm/yyyy) (0 for exit): ");
+                    stringDate = scanner.next();
+                if (exitCheck(stringDate)) return;
+            }
+
+            dd = Integer.parseInt(stringDate.substring(0, 2));
+            mm = Integer.parseInt(stringDate.substring(3, 5));
+            yyyy = Integer.parseInt(stringDate.substring(6, 10));
+            if (dd > 0 && dd <= 31 && mm > 0 && mm <= 12 && yyyy >= 0) {
+                if (mm == 4 || mm == 6 || mm == 9 || mm == 11) {
+                    if (dd == 31) continue; // ne ok
+                } else if (dd > 28 && mm == 2 && yyyy % 4 != 0) {
+                    continue; // vse ok
+                } else if (dd > 29 && mm == 2) continue; // vse ok
+                break;
+            }
+        }
+        date.set(yyyy, mm - 1, dd);
+
+        Flight flight = new Flight(key, takenSeats, date);
+        flightsList.add(flight);
+
+        System.out.println("The flight is successfully dobavlen.");
+    }
+
+    public static void showFlights() {
+        if (flightsList.isEmpty()) {
+            System.out.println("No flights, list is empty.");
+            return;
+        }
+        System.out.println("\n");
+        Collections.sort(flightsList);
+        for (Flight buffer: flightsList) {
+            System.out.println("Date: " + buffer.getDate().get(Calendar.DAY_OF_MONTH) + "/" + (buffer.getDate().get(Calendar.MONTH) + 1) + "/" + buffer.getDate().get(Calendar.YEAR) + ", plane: " + planesList.get(buffer.getKey()).getMark() + ", number " + buffer.getKey() + ", number of the taken seats: " + buffer.getTakenSeats() + ".");
+        }
+    }
+
+    public static boolean exitCheck(int ans) {
+        if (ans == 0) {
+            System.out.println("Vvod is canceled, back to the main menu.");
+            return true;
+        } else return false;
+    }
+
+    public static boolean exitCheck(double ans) {
+        if (ans == 0) {
+            System.out.println("Vvod is canceled, back to the main menu.");
+            return true;
+        } else return false;
+    }
+
+    public static boolean exitCheck(String ans) {
+        if (ans.equals("0")) {
+            System.out.println("Vvod is canceled, back to the main menu.");
+            return true;
+        } else return false;
+    }
+}
+
+class Employee {
+    private String name, surname, position;
+    private int age;
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    Employee(String name, String surname, String position, int age) {
+        setName(name);
+        setSurname(surname);
+        setPosition(position);
+        setAge(age);
+    }
+}
+
+class Plane {
+    private String mark;
+    private double weight;
+    private Integer capacity, key;
+    private boolean vacant;
+
+    public String getMark() {
+        return mark;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+
+    public Integer getKey() {
+        return key;
+    }
+
+    public boolean getVacant() {
+        return vacant;
+    }
+
+    public void setMark(String mark) {
+        this.mark = mark;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public void setKey(Integer key) {
+        this.key = key;
+    }
+
+    public void setVacant(boolean vacant) {
+        this.vacant = vacant;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+
+    Plane(String mark, double weight, int capacity, Integer key, boolean vacant) {
+        setMark(mark);
+        setWeight(weight);
+        setCapacity(capacity);
+        setKey(key);
+        setVacant(vacant);
+    }
+}
+
+class Flight implements Comparable<Flight> {
+    private Integer key;
+    private int takenSeats;
+    private GregorianCalendar date;
+
+    public Integer getKey() {
+        return key;
+    }
+
+    public int getTakenSeats() {
+        return takenSeats;
+    }
+
+    public GregorianCalendar getDate() {
+        return date;
+    }
+
+    public void setKey(Integer key) {
+        this.key = key;
+    }
+
+    public void setDate(GregorianCalendar date) {
+        this.date = date;
+    }
+
+    public void setTakenSeats(int takenSeats) {
+        this.takenSeats = takenSeats;
+    }
+
+    Flight(Integer key, int takenSeats, GregorianCalendar date) {
+        setKey(key);
+        setTakenSeats(takenSeats);
+        setDate(date);
+    }
+
+    @Override
+    public int compareTo(Flight f) {
+        return this.getDate().compareTo(f.getDate());
+    }
+}

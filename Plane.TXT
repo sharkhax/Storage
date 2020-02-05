@@ -1,0 +1,55 @@
+class Plane {
+    private String mark;
+    private double weight;
+    private Integer capacity, key;
+    private boolean vacant;
+
+    public String getMark() {
+        return mark;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+
+    public Integer getKey() {
+        return key;
+    }
+
+    public boolean getVacant() {
+        return vacant;
+    }
+
+    public void setMark(String mark) {
+        this.mark = mark;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public void setKey(Integer key) {
+        this.key = key;
+    }
+
+    public void setVacant(boolean vacant) {
+        this.vacant = vacant;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    Plane(String mark, double weight, int capacity, Integer key, boolean vacant) {
+        setMark(mark);
+        setWeight(weight);
+        setCapacity(capacity);
+        setKey(key);
+        setVacant(vacant);
+    }
+}

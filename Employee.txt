@@ -1,0 +1,43 @@
+class Employee {
+    private String name, surname, position;
+    private int age;
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    Employee(String name, String surname, String position, int age) {
+        setName(name);
+        setSurname(surname);
+        setPosition(position);
+        setAge(age);
+    }
+}

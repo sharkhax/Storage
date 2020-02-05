@@ -1,0 +1,40 @@
+class Flight implements Comparable<Flight> {
+    private Integer key;
+    private int takenSeats;
+    private GregorianCalendar date;
+
+    public Integer getKey() {
+        return key;
+    }
+
+    public int getTakenSeats() {
+        return takenSeats;
+    }
+
+    public GregorianCalendar getDate() {
+        return date;
+    }
+
+    public void setKey(Integer key) {
+        this.key = key;
+    }
+
+    public void setDate(GregorianCalendar date) {
+        this.date = date;
+    }
+
+    public void setTakenSeats(int takenSeats) {
+        this.takenSeats = takenSeats;
+    }
+
+    Flight(Integer key, int takenSeats, GregorianCalendar date) {
+        setKey(key);
+        setTakenSeats(takenSeats);
+        setDate(date);
+    }
+
+    @Override
+    public int compareTo(Flight f) {
+        return this.getDate().compareTo(f.getDate());
+    }
+}

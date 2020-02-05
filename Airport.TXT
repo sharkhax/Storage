@@ -53,10 +53,9 @@ public class Airport {
                     System.exit(1);
                 }
             }
-
         }
-
     }
+    
     public static void addEmployee() {
         int i = 0;
         int age;
@@ -340,7 +339,6 @@ class Plane {
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
-
 
     Plane(String mark, double weight, int capacity, Integer key, boolean vacant) {
         setMark(mark);

@@ -91,6 +91,7 @@ public class Airport {
 
         System.out.println("The employee is successfully dobavlen.");
     }
+private void print(String Param)    System.out.println("Vvedite"+ Param +" of the employee (0 for exit): ")
 
     public static void addPlane() {
         Integer key;

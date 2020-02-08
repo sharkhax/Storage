@@ -1,9 +1,11 @@
+import java.util.*;
+
 class Flight implements Comparable<Flight> {
-    private Integer key;
+    private String key;
     private int takenSeats;
     private GregorianCalendar date;
 
-    public Integer getKey() {
+    public String getKey() {
         return key;
     }
 
@@ -15,7 +17,7 @@ class Flight implements Comparable<Flight> {
         return date;
     }
 
-    public void setKey(Integer key) {
+    public void setKey(String key) {
         this.key = key;
     }
 
@@ -27,7 +29,7 @@ class Flight implements Comparable<Flight> {
         this.takenSeats = takenSeats;
     }
 
-    Flight(Integer key, int takenSeats, GregorianCalendar date) {
+    Flight(String key, int takenSeats, GregorianCalendar date) {
         setKey(key);
         setTakenSeats(takenSeats);
         setDate(date);
@@ -36,5 +38,12 @@ class Flight implements Comparable<Flight> {
     @Override
     public int compareTo(Flight f) {
         return this.getDate().compareTo(f.getDate());
+    }
+
+    @Override
+    public String toString() {
+        return "Date: " + date.get(Calendar.DAY_OF_MONTH)  + "/" + (date.get(Calendar.MONTH) + 1) + "/" +
+                date.get(Calendar.YEAR) + ", plane: " + Airport.planesList.get(key).getMark() + ", number " + key +
+                ", number of the taken seats: " + takenSeats + ".";
     }
 }

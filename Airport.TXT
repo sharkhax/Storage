@@ -3,22 +3,28 @@ import java.util.*;
 import static java.lang.Character.isDigit;
 
 public class Airport {
-    public static final int MAX_NUMBER_OF_EMPLOYEES = 10;
+    private static final int MAX_NUMBER_OF_EMPLOYEES = 10;
+    private static final String NEXT_MESSAGE_OF_MAIN_MENU = "Choose what do you want to do:\n0. Exit\n" +
+            "1. Add new plane\n2. Add new employee\n3. Add new flight\n4. Show flights\nEnter number: ";
+    private static final String FIRST_MESSAGE_OF_MAIN_MENU = "Welcome to the airport named after Vladosss. " +
+            NEXT_MESSAGE_OF_MAIN_MENU;
+    private static final String DIVIDING_LINE = "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
+    private static final String ENTERING_CANCEL_MESSAGE = "Entering is canceled, back to the main menu.";
+    private static final String FLIGHTS_LIST_IS_EMPTY_MESSAGE = "No flights, list is empty.";
 
     private static Employee[] employeesList = new Employee[MAX_NUMBER_OF_EMPLOYEES];
-    private static HashMap<Integer, Plane> planesList = new HashMap<>();
-    private static ArrayList<Flight> flightsList = new ArrayList<>();
+    static Map<String, Plane> planesList = new HashMap<>();
+    private static List<Flight> flightsList = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-
         short ans;
         boolean start = false;
 
-        System.out.println("Vas privetstvuet airport named after Vladosss. Choose what do u want to do:\n1. Dobavit' plane\n2. Dobavit' employee\n3. Dobavit' flight\n4. Show flights\nFor exit vvedite 0\nVvedite chislo: ");
+        System.out.println(FIRST_MESSAGE_OF_MAIN_MENU);
         while (true) {
             if (start)
-                System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nChoose what do u want to do:\n1. Dobavit' plane\n2. Dobavit' employee\n3. Dobavit' flight\n4. Show flights\nFor exit vvedite 0\nVvedite chislo: ");
+                System.out.println(DIVIDING_LINE + NEXT_MESSAGE_OF_MAIN_MENU);
             start = true;
             ans = scanner.nextShort();
             while (ans > 4 || ans < 0) {
@@ -55,135 +61,189 @@ public class Airport {
             }
         }
     }
-    
-    public static void addEmployee() {
+
+    private static void addEmployee() {
         int i = 0;
-        int age;
 
         while (i < employeesList.length && employeesList[i] != null)
             i++;
-        if (i == employeesList.length)
+        if (i == employeesList.length) {
             System.out.println("Sorry, but there is no vacant places =(");
+            return;
+        }
 
-        System.out.println("Vvedite name of the employee (0 for exit): ");
-        String name = scanner.next();
+        String name = enteringStringMessages("name", "employee");
         if (exitCheck(name)) return;
 
-        System.out.println("Vvedite surname of the employee (0 for exit): ");
-        String surname = scanner.next();
+        String surname = enteringStringMessages("surname", "employee");
         if (exitCheck(surname)) return;
 
-        System.out.println("Vvedite dolzhnost' of the employee (0 for exit): ");
-        String position = scanner.next();
+        String position = enteringStringMessages("position", "employee");
         if (exitCheck(position)) return;
 
-        System.out.println("Vvedite age of the employee (0 for exit): ");
+        int age = enteringIntMessages("age", "employee");
         while (true) {
-           age = scanner.nextInt();
             if (exitCheck(age)) return;
             if (age < 18) {
                 System.out.println("Incorrect value, employee should be 18+, retry (0 for exit): ");
+                age = scanner.nextInt();
             } else break;
         }
 
-        Employee employee = new Employee(name, surname, position, age);
-        employeesList[i] = employee;
-
-        System.out.println("The employee is successfully dobavlen.");
+        employeesList[i] = new Employee(name, surname, position, age);
+        successfullyAddedMessage("employee");
     }
-private void print(String Param)    System.out.println("Vvedite"+ Param +" of the employee (0 for exit): ")
 
-    public static void addPlane() {
-        Integer key;
-        double weight;
-        int capacity;
-
-        System.out.println("Vvedite mark of the samolet, w/t spaces (0 for exit): ");
-        String mark = scanner.next();
+    private static void addPlane() {
+        String mark = enteringStringMessages("mark", "plane");
         if (exitCheck(mark)) return;
 
-        System.out.println("Vvedite number of the samolet (0 for exit): ");
+        String key = enteringStringMessages("number", "plane");
         while (true) {
-            key = scanner.nextInt();
             if (exitCheck(key)) return;
-            if (key < 0) {
-                System.out.println("Wrong value, should be positive, retry (0 for exit): ");
-            } else if (planesList.containsKey(key)) {
+            if (planesList.containsKey(key)) {
                 System.out.println("This plane is already exists, retry (0 for exit): ");
+                key = scanner.next();
             } else break;
         }
 
-        System.out.println("Vvedite weight of the samolet (0 for exit): ");
+        double weight = enteringDoubleMessages("weight", "plane");
         while (true) {
-            weight = scanner.nextDouble();
             if (exitCheck(weight)) return;
-            if (weight < 0) {
-                System.out.println("Wrong value, should be positive, retry (0 for exit): ");
+            if (negativeCheck(weight)) {
+                weight = scanner.nextDouble();
             } else break;
         }
 
-        System.out.println("Vvedite capacity of the samolet (0 for exit): ");
+        int capacity = enteringIntMessages("capacity", "plane");
         while (true) {
-            capacity = scanner.nextInt();
             if (exitCheck(capacity)) return;
-            if (capacity < 0) {
-                System.out.println("Wrong value, should be positive, retry (0 for exit): ");
+            if (negativeCheck(capacity)) {
+                capacity = scanner.nextInt();
             } else break;
         }
 
-        Plane plane = new Plane(mark, weight, capacity, key, true);
-        planesList.put(key, plane);
-
-        System.out.println("The samolet is successfully dobavlen.");
+        planesList.put(key, new Plane(mark, weight, capacity, key, true));
+        successfullyAddedMessage("plane");
     }
 
-    public static void addFlight() {
-        GregorianCalendar date = new GregorianCalendar();
-        int dd, mm, yyyy;
-        String stringDate;
-        boolean start = false;
+    private static void addFlight() {
         int takenSeats;
+        String stringDate, key;
 
-        System.out.println("Vvedite number of the samoleta which will fly (0 for exit): ");
-        int key = scanner.nextInt();
-        if (exitCheck(key)) return;
+
+        System.out.println("Enter number of the plane which will fly (0 for exit): ");
         while (true) {
+            key = scanner.next();
+            if (exitCheck(key)) return;
             if (!planesList.containsKey(key)) {
                 System.out.println("There is no plane like this, retry (0 for exit): ");
-                key = scanner.nextInt();
                 if (exitCheck(key)) return;
             } else if (planesList.get(key).getVacant()) {
                 planesList.get(key).setVacant(false);
                 break;
-            } else {
-                System.out.println("Chosen plane isnt vacant, retry (0 for exit): ");
-                key = scanner.nextInt();
-                if (exitCheck(key)) return;
-            }
+            } else System.out.println("Chosen plane isn't vacant, retry (0 for exit): ");
         }
 
-        System.out.println("Vvedite number of zabronirovannyh mest (-1 for exit): ");
+        System.out.println("Enter number of the taken seats (-1 for exit): ");
         while (true) {
             takenSeats = scanner.nextInt();
             if (takenSeats < -1) {
-                System.out.println("Wrong value, shouldnt be negative (or -1), retry (-1 for exit): ");
+                System.out.println("Wrong value, shouldn't be negative, retry (-1 for exit): ");
             } else if (takenSeats == -1) {
-                System.out.println("Vvod is canceled, back to the main menu.");
+                System.out.println(ENTERING_CANCEL_MESSAGE);
                 return;
             } else if (planesList.get(key).getCapacity() < takenSeats) {
-                System.out.println("Error, the capacity of the plane is less than the number of taken seats. Retry (-1 for exit): ");
+                System.out.println("Error, the capacity of the plane is less than the number of taken seats. " +
+                        "Retry (-1 for exit): ");
             } else break;
         }
 
-        System.out.println("Vvedite datu of the flight in format dd/mm/yyyy (0 for exit): ");
+        System.out.println("Enter date of the flight in format dd/mm/yyyy (0 for exit): ");
         stringDate = scanner.next();
         if (exitCheck(stringDate)) return;
+        DateCheckResult date = dateFormatCheck(stringDate);
+        if (!date.isResult()) return;
+
+        flightsList.add(new Flight(key, takenSeats, date.getDate()));
+        successfullyAddedMessage("flight");
+    }
+
+    private static void showFlights() {
+        if (flightsList.isEmpty()) {
+            System.out.println(FLIGHTS_LIST_IS_EMPTY_MESSAGE);
+            return;
+        }
+        System.out.println("\n");
+        Collections.sort(flightsList);
+        for (Flight buffer : flightsList) {
+            System.out.println(buffer.toString());
+        }
+    }
+
+    private static boolean exitCheck(int ans) {
+        if (ans == 0) {
+            System.out.println(ENTERING_CANCEL_MESSAGE);
+            return true;
+        } else return false;
+    }
+
+    private static boolean exitCheck(double ans) {
+        if (ans == 0.0) {
+            System.out.println(ENTERING_CANCEL_MESSAGE);
+            return true;
+        } else return false;
+    }
+
+    private static boolean exitCheck(String ans) {
+        if (ans.equals("0")) {
+            System.out.println(ENTERING_CANCEL_MESSAGE);
+            return true;
+        } else return false;
+    }
+
+    private static int enteringIntMessages(String value, String className) {
+        System.out.println("Enter " + value + " of the " + className + " (0 for exit): ");
+        return scanner.nextInt();
+    }
+
+    private static double enteringDoubleMessages(String value, String className) {
+        System.out.println("Enter " + value + " of the " + className + " (0 for exit): ");
+        return scanner.nextDouble();
+    }
+
+    private static String enteringStringMessages(String value, String className) {
+        System.out.println("Enter " + value + " of the " + className + " (0 for exit): ");
+        return scanner.next();
+    }
+
+    private static boolean negativeCheck(int value) {
+        if (value < 0) {
+            System.out.println("Wrong value, should be positive, retry (0 for exit): ");
+            return true;
+        } else return false;
+    }
+
+    private static boolean negativeCheck(double value) {
+        if (value < 0.0) {
+            System.out.println("Wrong value, should be positive, retry (0 for exit): ");
+            return true;
+        } else return false;
+    }
+
+    private static void successfullyAddedMessage(String value) {
+        System.out.println("The " + value + " is successfully added.");
+    }
+
+    private static DateCheckResult dateFormatCheck(String stringDate) {
+        boolean start = false;
+        int dd, mm, yyyy;
 
         while (true) {
             if (start) {
-                System.out.println("Wrong format, retry (dd/mm/yyyy) (0 for exit): ");
+                wrongFormatMessage();
                 stringDate = scanner.next();
-                if (exitCheck(stringDate)) return;
+                if (exitCheck(stringDate)) return new DateCheckResult(false, null);
             }
             start = true;
             while (true) {
@@ -191,9 +251,9 @@ private void print(String Param)    System.out.println("Vvedite"+ Param +" of th
                     if (stringDate.charAt(2) == '/' && stringDate.charAt(5) == '/')
                         if (isDigit(stringDate.charAt(0)) && isDigit(stringDate.charAt(1)) && isDigit(stringDate.charAt(3)) && isDigit(stringDate.charAt(4)) && isDigit(stringDate.charAt(6)) && isDigit(stringDate.charAt(7)) && isDigit(stringDate.charAt(8)) && isDigit(stringDate.charAt(9)))
                             break;
-                    System.out.println("Wrong format, retry (dd/mm/yyyy) (0 for exit): ");
-                    stringDate = scanner.next();
-                if (exitCheck(stringDate)) return;
+                wrongFormatMessage();
+                stringDate = scanner.next();
+                if (exitCheck(stringDate)) return new DateCheckResult(false, null);
             }
 
             dd = Integer.parseInt(stringDate.substring(0, 2));
@@ -208,44 +268,10 @@ private void print(String Param)    System.out.println("Vvedite"+ Param +" of th
                 break;
             }
         }
-        date.set(yyyy, mm - 1, dd);
-
-        Flight flight = new Flight(key, takenSeats, date);
-        flightsList.add(flight);
-
-        System.out.println("The flight is successfully dobavlen.");
+        return new DateCheckResult(true, new GregorianCalendar(yyyy, mm - 1, dd));
     }
 
-    public static void showFlights() {
-        if (flightsList.isEmpty()) {
-            System.out.println("No flights, list is empty.");
-            return;
-        }
-        System.out.println("\n");
-        Collections.sort(flightsList);
-        for (Flight buffer: flightsList) {
-            System.out.println("Date: " + buffer.getDate().get(Calendar.DAY_OF_MONTH) + "/" + (buffer.getDate().get(Calendar.MONTH) + 1) + "/" + buffer.getDate().get(Calendar.YEAR) + ", plane: " + planesList.get(buffer.getKey()).getMark() + ", number " + buffer.getKey() + ", number of the taken seats: " + buffer.getTakenSeats() + ".");
-        }
-    }
-
-    public static boolean exitCheck(int ans) {
-        if (ans == 0) {
-            System.out.println("Vvod is canceled, back to the main menu.");
-            return true;
-        } else return false;
-    }
-
-    public static boolean exitCheck(double ans) {
-        if (ans == 0) {
-            System.out.println("Vvod is canceled, back to the main menu.");
-            return true;
-        } else return false;
-    }
-
-    public static boolean exitCheck(String ans) {
-        if (ans.equals("0")) {
-            System.out.println("Vvod is canceled, back to the main menu.");
-            return true;
-        } else return false;
+    private static void wrongFormatMessage() {
+        System.out.println("Wrong format (dd/mm/yyyy), retry (0 for exit): ");
     }
 }

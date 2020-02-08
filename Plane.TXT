@@ -1,7 +1,7 @@
 class Plane {
-    private String mark;
+    private String mark, key;
     private double weight;
-    private Integer capacity, key;
+    private int capacity;
     private boolean vacant;
 
     public String getMark() {
@@ -16,8 +16,7 @@ class Plane {
         return capacity;
     }
 
-
-    public Integer getKey() {
+    public String  getKey() {
         return key;
     }
 
@@ -33,7 +32,7 @@ class Plane {
         this.weight = weight;
     }
 
-    public void setKey(Integer key) {
+    public void setKey(String key) {
         this.key = key;
     }
 
@@ -45,7 +44,7 @@ class Plane {
         this.capacity = capacity;
     }
 
-    Plane(String mark, double weight, int capacity, Integer key, boolean vacant) {
+    Plane(String mark, double weight, int capacity, String key, boolean vacant) {
         setMark(mark);
         setWeight(weight);
         setCapacity(capacity);

@@ -1,3 +1,6 @@
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 import static java.lang.Character.isDigit;
@@ -72,21 +75,21 @@ public class Airport {
             return;
         }
 
-        String name = enteringStringMessages("name", "employee");
+        String name = inputString("name", "employee");
         if (exitCheck(name)) return;
 
-        String surname = enteringStringMessages("surname", "employee");
+        String surname = inputString("surname", "employee");
         if (exitCheck(surname)) return;
 
-        String position = enteringStringMessages("position", "employee");
+        String position = inputString("position", "employee");
         if (exitCheck(position)) return;
 
-        int age = enteringIntMessages("age", "employee");
+        int age = inputInt("age", "employee", false);
         while (true) {
             if (exitCheck(age)) return;
             if (age < 18) {
                 System.out.println("Incorrect value, employee should be 18+, retry (0 for exit): ");
-                age = scanner.nextInt();
+                age = inputInt(null, null, true);
             } else break;
         }
 
@@ -95,10 +98,10 @@ public class Airport {
     }
 
     private static void addPlane() {
-        String mark = enteringStringMessages("mark", "plane");
+        String mark = inputString("mark", "plane");
         if (exitCheck(mark)) return;
 
-        String key = enteringStringMessages("number", "plane");
+        String key = inputString("number", "plane");
         while (true) {
             if (exitCheck(key)) return;
             if (planesList.containsKey(key)) {
@@ -107,19 +110,19 @@ public class Airport {
             } else break;
         }
 
-        double weight = enteringDoubleMessages("weight", "plane");
+        double weight = inputDouble("weight", "plane", false);
         while (true) {
             if (exitCheck(weight)) return;
             if (negativeCheck(weight)) {
-                weight = scanner.nextDouble();
+                weight = inputDouble(null, null, true);
             } else break;
         }
 
-        int capacity = enteringIntMessages("capacity", "plane");
+        int capacity = inputInt("capacity", "plane", false);
         while (true) {
             if (exitCheck(capacity)) return;
             if (negativeCheck(capacity)) {
-                capacity = scanner.nextInt();
+                capacity = inputInt(null, null, true);
             } else break;
         }
 
@@ -130,7 +133,6 @@ public class Airport {
     private static void addFlight() {
         int takenSeats;
         String stringDate, key;
-
 
         System.out.println("Enter number of the plane which will fly (0 for exit): ");
         while (true) {
@@ -181,38 +183,50 @@ public class Airport {
         }
     }
 
-    private static boolean exitCheck(int ans) {
-        if (ans == 0) {
+    private static <t> boolean exitCheck(t ans) {
+        if (ans.equals(0.0) || ans.equals("0") || ans.equals(0)) {
             System.out.println(ENTERING_CANCEL_MESSAGE);
             return true;
         } else return false;
     }
 
-    private static boolean exitCheck(double ans) {
-        if (ans == 0.0) {
-            System.out.println(ENTERING_CANCEL_MESSAGE);
-            return true;
-        } else return false;
-    }
-
-    private static boolean exitCheck(String ans) {
-        if (ans.equals("0")) {
-            System.out.println(ENTERING_CANCEL_MESSAGE);
-            return true;
-        } else return false;
-    }
-
-    private static int enteringIntMessages(String value, String className) {
+    private static int inputInt(String value, String className, boolean noMessage) throws InputMismatchException {
+        boolean isCaught = false;
+        int input = -1;
+        if(!noMessage)
         System.out.println("Enter " + value + " of the " + className + " (0 for exit): ");
-        return scanner.nextInt();
+        do {
+            try {
+                input = scanner.nextInt();
+                isCaught = false;
+            } catch (InputMismatchException e) {
+                System.out.println("Wrong value, retry (0 for exit): ");
+                scanner.next();
+                isCaught = true;
+            }
+        } while (isCaught);
+        return input;
     }
 
-    private static double enteringDoubleMessages(String value, String className) {
+    private static double inputDouble(String value, String className, boolean noMessage) throws InputMismatchException {
+        double input = -1;
+        boolean isCaught = false;
+        if (!noMessage)
         System.out.println("Enter " + value + " of the " + className + " (0 for exit): ");
-        return scanner.nextDouble();
+        do {
+            try {
+                input = scanner.nextDouble();
+                isCaught = false;
+            } catch (InputMismatchException e) {
+                System.out.println("Wrong value, retry (0 for exit): ");
+                scanner.next();
+                isCaught = true;
+            }
+        } while (isCaught);
+        return input;
     }
 
-    private static String enteringStringMessages(String value, String className) {
+    private static String inputString(String value, String className) {
         System.out.println("Enter " + value + " of the " + className + " (0 for exit): ");
         return scanner.next();
     }
@@ -249,7 +263,10 @@ public class Airport {
             while (true) {
                 if (stringDate.length() == 10)
                     if (stringDate.charAt(2) == '/' && stringDate.charAt(5) == '/')
-                        if (isDigit(stringDate.charAt(0)) && isDigit(stringDate.charAt(1)) && isDigit(stringDate.charAt(3)) && isDigit(stringDate.charAt(4)) && isDigit(stringDate.charAt(6)) && isDigit(stringDate.charAt(7)) && isDigit(stringDate.charAt(8)) && isDigit(stringDate.charAt(9)))
+                        if (isDigit(stringDate.charAt(0)) && isDigit(stringDate.charAt(1))
+                                && isDigit(stringDate.charAt(3)) && isDigit(stringDate.charAt(4))
+                                && isDigit(stringDate.charAt(6)) && isDigit(stringDate.charAt(7))
+                                && isDigit(stringDate.charAt(8)) && isDigit(stringDate.charAt(9)))
                             break;
                 wrongFormatMessage();
                 stringDate = scanner.next();
